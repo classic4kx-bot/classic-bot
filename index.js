@@ -1,10 +1,97 @@
-{ Client, GatewayIntentBits, EmbedBuilder } = require(‘discord.js’); const { CronJob } = require(‘cron’); require(‘dotenv’).config(); const client = new Client({ intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, ], }); const TOKEN = process.env.TOKEN; const CHANNEL_ID = process.env.CHANNEL_ID; async function send(title, description, color) { try { const channel = await client.channels.fetch(CHANNEL_ID); if (!channel) { console.error(‘Channel not found for CHANNEL_ID:’, CHANNEL_ID); return; }
-const embed = new EmbedBuilder()
-  .setTitle(title)
-  .setDescription(description)
-  .setColor(color)
-  .setFooter({ text: 'Classic Trades' })
-  .setTimestamp();
+const { EmbedBuilder } = require("discord.js");
+const cron = require("node-cron");
 
-await channel.send({ content: '@everyone', embeds: [embed] });
-} catch (err) { console.error(‘Error sending notification:’, err); } } const GREEN = 0x00ff00; const RED = 0xff0000; const YELLOW = 0xffff00; const BLUE = 0x3498db; const jobs = []; function schedule(cronTime, timezone, fn) { const job = new CronJob(cronTime, fn, null, true, timezone); jobs.push(job); return job; } // FOREX MARKET (overall weekly window) // Opens Sunday 5:00 PM New York time schedule(‘0 0 17 * * 0’, ‘America/New_York’, () => { send(‘🟢 Forex Market Open’, ‘The global Forex market has opened for the week.’, GREEN); }); // Closes Friday 5:00 PM New York time schedule(‘0 0 17 * * 5’, ‘America/New_York’, () => { send(‘🔴 Forex Market Closed’, ‘The global Forex market has closed for the week.’, RED); }); // SYDNEY SESSION - 7:00 AM - 4:00 PM Australia/Sydney, Mon-Fri schedule(‘0 0 7 * * 1-5’, ‘Australia/Sydney’, () => { send(‘🟢 Sydney Session Open’, ‘The Sydney trading session has opened.’, GREEN); }); schedule(‘0 0 16 * * 1-5’, ‘Australia/Sydney’, () => { send(‘🔴 Sydney Session Closed’, ‘The Sydney trading session has closed.’, RED); }); // TOKYO SESSION - 9:00 AM - 6:00 PM Asia/Tokyo, Mon-Fri schedule(‘0 0 9 * * 1-5’, ‘Asia/Tokyo’, () => { send(‘🟢 Tokyo Session Open’, ‘The Tokyo trading session has opened.’, GREEN); }); schedule(‘0 0 18 * * 1-5’, ‘Asia/Tokyo’, () => { send(‘🔴 Tokyo Session Closed’, ‘The Tokyo trading session has closed.’, RED); }); // LONDON SESSION - 8:00 AM - 4:30 PM Europe/London, Mon-Fri schedule(‘0 0 8 * * 1-5’, ‘Europe/London’, () => { send(‘🟢 London Session Open’, ‘The London trading session has opened.’, GREEN); }); schedule(‘0 30 16 * * 1-5’, ‘Europe/London’, () => { send(‘🔴 London Session Closed’, ‘The London trading session has closed.’, RED); }); // NEW YORK SESSION - 8:00 AM - 5:00 PM America/New_York, Mon-Fri schedule(‘0 0 8 * * 1-5’, ‘America/New_York’, () => { send(‘🟢 New York Session Open’, ‘The New York trading session has opened.’, GREEN); }); schedule(‘0 0 17 * * 1-5’, ‘America/New_York’, () => { send(‘🔴 New York Session Closed’, ‘The New York trading session has closed.’, RED); }); // LONDON-NEW YORK OVERLAP // Overlap window: 8:00 AM ET (New York open) - 4:30 PM UK (London close), Mon-Fri schedule(‘0 0 8 * * 1-5’, ‘America/New_York’, () => { send(‘🔵 London-New York Overlap Started’, ‘The London and New York trading sessions are now overlapping.’, BLUE); }); schedule(‘0 30 16 * * 1-5’, ‘Europe/London’, () => { send(‘🔵 London-New York Overlap Ended’, ‘The London and New York trading session overlap has ended.’, BLUE); }); // CME FUTURES MARKET // Weekly open - Sunday 6:00 PM ET schedule(‘0 0 18 * * 0’, ‘America/New_York’, () => { send(‘🟢 CME Futures Market Open’, ‘The CME Futures market has opened for the week.’, GREEN); }); // Weekly close - Friday 5:00 PM ET schedule(‘0 0 17 * * 5’, ‘America/New_York’, () => { send(‘🔴 CME Futures Market Closed’, ‘The CME Futures market has closed for the week.’, RED); }); // Daily maintenance start - Mon-Thu 5:00 PM ET schedule(‘0 0 17 * * 1-4’, ‘America/New_York’, () => { send(‘🟡 CME Daily Maintenance’, ‘CME Futures daily maintenance break has started (5:00 PM - 6:00 PM ET).’, YELLOW); }); // CME reopen after maintenance - Mon-Thu 6:00 PM ET schedule(‘0 0 18 * * 1-4’, ‘America/New_York’, () => { send(‘🟢 CME Futures Reopened’, ‘CME Futures trading has reopened after the daily maintenance break.’, GREEN); }); client.once(‘ready’, () => { console.log(Logged in as ${client.user.tag}); console.log(${jobs.length} cron jobs scheduled.); }); client.login(TOKEN);
+const CHANNEL_ID = "1531350712204787893";
+
+const reminders = [
+  {
+    title: "🌏 Asia Session OPEN",
+    schedule: "0 17 * * 1-5",
+    color: 0x3498db,
+    description:
+      "• Asia Session is now live.\n" +
+      "• Focus on liquidity and range development.\n" +
+      "• Best pairs: JPY, AUD, NZD.\n" +
+      "• Wait for confirmation before entering."
+  },
+  {
+    title: "🌏 Asia Session CLOSED",
+    schedule: "0 2 * * 2-6",
+    color: 0x95a5a6,
+    description:
+      "• Asia Session has ended.\n" +
+      "• Avoid forcing trades.\n" +
+      "• Get ready for London volatility."
+  },
+  {
+    title: "🇬🇧 London Session OPEN",
+    schedule: "0 0 * * 2-6",
+    color: 0x2ecc71,
+    description:
+      "• London Session is now live.\n" +
+      "• Increased volatility ahead.\n" +
+      "• Watch for breakouts and trend continuation."
+  },
+  {
+    title: "🇬🇧 London Session CLOSED",
+    schedule: "0 9 * * 2-6",
+    color: 0x95a5a6,
+    description:
+      "• London Session has ended.\n" +
+      "• Liquidity may begin slowing.\n" +
+      "• Stay disciplined if you're still trading."
+  },
+  {
+    title: "🇺🇸 New York Session OPEN",
+    schedule: "0 6 * * 1-5",
+    color: 0xe74c3c,
+    description:
+      "• New York Session is now live.\n" +
+      "• Watch for USD news and strong momentum.\n" +
+      "• Trade your plan, not your emotions."
+  },
+  {
+    title: "🇺🇸 New York Session CLOSED",
+    schedule: "0 15 * * 1-5",
+    color: 0x95a5a6,
+    description:
+      "• New York Session has ended.\n" +
+      "• Trading day is complete.\n" +
+      "• Journal your trades and prepare for tomorrow."
+  }
+];
+
+client.once("ready", async () => {
+  console.log(`${client.user.tag} is online!`);
+
+  const channel = await client.channels.fetch(CHANNEL_ID);
+
+  reminders.forEach((reminder) => {
+    cron.schedule(
+      reminder.schedule,
+      async () => {
+        const embed = new EmbedBuilder()
+          .setColor(reminder.color)
+          .setTitle(reminder.title)
+          .setDescription(reminder.description)
+          .setFooter({
+            text: "ClassicTrades • Stay Disciplined"
+          })
+          .setTimestamp();
+
+        await channel.send({
+          content: "@everyone",
+          embeds: [embed],
+          allowedMentions: {
+            parse: ["everyone"]
+          }
+        });
+
+        console.log(`${reminder.title} reminder sent.`);
+      },
+      {
+        timezone: "America/Phoenix"
+      }
+    );
+  });
+});
