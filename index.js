@@ -36,7 +36,11 @@ async function sendSession(title, description, color) {
 
 client.once("ready", () => {
   console.log(`${client.user.tag} is online!`);
-
+sendSession(
+  "🧪 Test Reminder",
+  "If you see this message, the Classic4KX bot is working!",
+  0x00ff00
+);
   // Asia
   cron.schedule("0 17 * * 0-4", () =>
     sendSession("🌏 Asia Session OPEN", "Time to watch JPY, AUD & NZD pairs.", 0x00ff00), { timezone: "America/Phoenix" });
