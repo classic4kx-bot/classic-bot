@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const cron = require("node-cron");
-
+const { testFMP } = require("./news");
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
@@ -36,6 +36,7 @@ async function sendSession(title, description, color) {
 
 client.once("ready", () => {
   console.log(`${client.user.tag} is online!`);
+    testFMP();
 sendSession(
   "🧪 Test Reminder",
   "If you see this message, the Classic4KX bot is working!",
