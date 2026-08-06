@@ -99,6 +99,54 @@ client.once("ready", () => {
     ),
     { timezone: "America/Phoenix" }
   );
+
+  // ===============================
+  // 📈 CME Futures Market
+  // ===============================
+
+  // Sunday Market Open
+  cron.schedule(
+    "0 16 * * 0",
+    () => sendSession(
+      "📈 Futures Market OPEN",
+      "📊 CME Futures are now OPEN.\n\nFocus:\n• Gold (GC)\n• Nasdaq (NQ)\n• S&P 500 (ES)\n• Dow (YM)\n• Crude Oil (CL)\n\nTrade smart and stick to your plan.",
+      0x00ff00
+    ),
+    { timezone: "America/Phoenix" }
+  );
+
+  // Monday - Thursday Maintenance Break
+  cron.schedule(
+    "0 15 * * 1-4",
+    () => sendSession(
+      "⏸️ Futures Market BREAK",
+      "The daily CME maintenance break has started.\n\nTrading resumes in 1 hour.",
+      0xffa500
+    ),
+    { timezone: "America/Phoenix" }
+  );
+
+  // Monday - Thursday Reopen
+  cron.schedule(
+    "0 16 * * 1-4",
+    () => sendSession(
+      "🔔 Futures Market REOPENED",
+      "The CME Futures Market has reopened.\n\nWatch for fresh liquidity and new opportunities.",
+      0x00ff00
+    ),
+    { timezone: "America/Phoenix" }
+  );
+
+  // Friday Close
+  cron.schedule(
+    "0 15 * * 5",
+    () => sendSession(
+      "🔒 Futures Market CLOSED",
+      "The CME Futures Market is now closed for the weekend.\n\nReview your trades and enjoy your weekend.",
+      0xff0000
+    ),
+    { timezone: "America/Phoenix" }
+  );
 });
 
 client.login(process.env.TOKEN);
