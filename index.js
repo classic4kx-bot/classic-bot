@@ -37,12 +37,12 @@ async function sendSession(title, description, color) {
 client.once("ready", () => {
   console.log(`${client.user.tag} is online!`);
 
-  // Asia
+  // 🌏 Asia Session
   cron.schedule(
     "0 17 * * 0-4",
     () => sendSession(
       "🌏 Asia Session OPEN",
-      "Time to watch JPY, AUD & NZD pairs.",
+      "📈 **Focus Markets**\n• JPY\n• AUD\n• NZD\n\n⚠️ Liquidity begins building. Watch for early session setups and avoid forcing trades.",
       0x00ff00
     ),
     { timezone: "America/Phoenix" }
@@ -52,18 +52,18 @@ client.once("ready", () => {
     "0 2 * * 1-5",
     () => sendSession(
       "🌏 Asia Session CLOSED",
-      "Asia session has closed.",
+      "📉 The Asia session has ended.\n\nPrepare for increased volatility as the London session approaches.",
       0xff0000
     ),
     { timezone: "America/Phoenix" }
   );
 
-  // London
+  // 🇬🇧 London Session
   cron.schedule(
     "0 1 * * 1-5",
     () => sendSession(
       "🇬🇧 London Session OPEN",
-      "London session is now live.",
+      "📈 **Focus Markets**\n• GBP\n• EUR\n\n⚠️ One of the highest volatility sessions. Watch for liquidity sweeps, breakouts, and trend continuation.",
       0x00ff00
     ),
     { timezone: "America/Phoenix" }
@@ -73,18 +73,18 @@ client.once("ready", () => {
     "0 10 * * 1-5",
     () => sendSession(
       "🇬🇧 London Session CLOSED",
-      "London session has closed.",
+      "📉 The London session has ended.\n\nAttention now shifts to the New York session.",
       0xff0000
     ),
     { timezone: "America/Phoenix" }
   );
 
-  // New York
+  // 🇺🇸 New York Session
   cron.schedule(
     "0 7 * * 1-5",
     () => sendSession(
       "🇺🇸 New York Session OPEN",
-      "New York session is now live.",
+      "📈 **Focus Markets**\n• USD\n• XAUUSD (Gold)\n• US Indices\n\n⚠️ Expect strong volatility, especially during the London and New York overlap.",
       0x00ff00
     ),
     { timezone: "America/Phoenix" }
@@ -94,7 +94,7 @@ client.once("ready", () => {
     "0 16 * * 1-5",
     () => sendSession(
       "🇺🇸 New York Session CLOSED",
-      "New York session has closed.",
+      "📉 The trading day has ended.\n\n📝 Review your trades, journal your results, and prepare for tomorrow's opportunities.",
       0xff0000
     ),
     { timezone: "America/Phoenix" }
