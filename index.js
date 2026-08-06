@@ -1,85 +1,62 @@
+require("dotenv").config();
+const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const cron = require("node-cron");
-const { EmbedBuilder } = require("discord.js");
 
-const CHANNEL_ID = "1531350712204787893";
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+const CHANNELS = [
+  "1531350712204787893", // Forex News
+  "1302408452534173848"  // General Chat
+];
+
+async function sendSession(title, description, color) {
+  for (const id of CHANNELS) {
+    try {
+      const channel = await client.channels.fetch(id);
+
+      const embed = new EmbedBuilder()
+        .setColor(color)
+        .setTitle(title)
+        .setDescription(description)
+        .setFooter({ text: "Classic4KX" })
+        .setTimestamp();
+
+      await channel.send({
+        content: "@everyone",
+        embeds: [embed],
+        allowedMentions: { parse: ["everyone"] }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+}
 
 client.once("ready", () => {
   console.log(`${client.user.tag} is online!`);
-  console.log("✅ Session reminders loaded.");
 
-  function sendReminder(title, description, color) {
-    const channel = client.channels.cache.get(CHANNEL_ID);
+  // Asia
+  cron.schedule("0 17 * * 0-4", () =>
+    sendSession("🌏 Asia Session OPEN", "Time to watch JPY, AUD & NZD pairs.", 0x00ff00), { timezone: "America/Phoenix" });
 
-    if (!channel) {
-      console.log("❌ Channel not found.");
-      return;
-    }
+  cron.schedule("0 2 * * 1-5", () =>
+    sendSession("🌏 Asia Session CLOSED", "Asia session has closed.", 0xff0000), { timezone: "America/Phoenix" });
 
-    const embed = new EmbedBuilder()
-      .setTitle(title)
-      .setDescription(description)
-      .setColor(color)
-      .setFooter({ text: "Classic Trades" })
-      .setTimestamp();
+  // London
+  cron.schedule("0 1 * * 1-5", () =>
+    sendSession("🇬🇧 London Session OPEN", "London session is now live.", 0x00ff00), { timezone: "America/Phoenix" });
 
-    channel.send({
-      content: "@everyone",
-      embeds: [embed],
-      allowedMentions: { parse: ["everyone"] }
-    });
-  }
+  cron.schedule("0 10 * * 1-5", () =>
+    sendSession("🇬🇧 London Session CLOSED", "London session has closed.", 0xff0000), { timezone: "America/Phoenix" });
 
-  // Asia Open
-  cron.schedule("0 17 * * 1-5", () => {
-    sendReminder(
-      "🌏 Asia Session OPEN",
-      "The Asia session is now open.\n\nStay patient and wait for your setup.",
-      0x3498db
-    );
-  }, { timezone: "America/Phoenix" });
+  // New York
+  cron.schedule("0 7 * * 1-5", () =>
+    sendSession("🇺🇸 New York Session OPEN", "New York session is now live.", 0x00ff00), { timezone: "America/Phoenix" });
 
-  // Asia Close
-  cron.schedule("0 2 * * 2-6", () => {
-    sendReminder(
-      "🌏 Asia Session CLOSED",
-      "The Asia session has ended.",
-      0x808080
-    );
-  }, { timezone: "America/Phoenix" });
-
-  // London Open
-  cron.schedule("0 0 * * 2-6", () => {
-    sendReminder(
-      "🇬🇧 London Session OPEN",
-      "London is now open. Expect increased volatility.",
-      0x2ecc71
-    );
-  }, { timezone: "America/Phoenix" });
-
-  // London Close
-  cron.schedule("0 9 * * 2-6", () => {
-    sendReminder(
-      "🇬🇧 London Session CLOSED",
-      "London has now closed.",
-      0x808080
-    );
-  }, { timezone: "America/Phoenix" });
-
-  // New York Open
-  cron.schedule("0 6 * * 1-5", () => {
-    sendReminder(
-      "🇺🇸 New York Session OPEN",
-      "New York is now open. Watch for USD volatility.",
-      0xe74c3c
-    );
-  }, { timezone: "America/Phoenix" });
-
-  // New York Close
-  cron.schedule("0 15 * * 1-5", () => {
-    sendReminder(
-      "🇺🇸 New York Session CLOSED",
-      "The New York session has ended. Journal your trades.",
-      0x808080
-    );
-  }, { timezone: "America/Phoenix" });
+  cron.schedule("0 16 * * 1-5", () =>
+    sendSession("🇺🇸 New York Session CLOSED", "New York session has closed.", 0xff0000), { timezone: "America/Phoenix" });
 });
+
+client.login(process.env.TOKEN);
